@@ -1,6 +1,12 @@
 #include <iostream>
 #include "raylib.h"
 
+#include "../include/texture.hpp"
+
+bool raylib_started = false;
+
+texture_manager texture_master;
+
 
 int main(){
 
