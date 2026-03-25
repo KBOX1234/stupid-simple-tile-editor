@@ -31,6 +31,10 @@ struct layer_header {
     } size;
 };
 
+struct tile_map_header{
+    uint8_t layer_count;
+};
+
 
 struct layer{
     int_vector2 size = {0};
@@ -84,5 +88,9 @@ class tilemap{
         void draw_tilemap(Vector2 offset);
 
         void toggle_layer(const std::string& name);
+
+        void export_tilemap(const std::string& fname);
+
+        void load_tilemap(const std::string& fname);
 
 };

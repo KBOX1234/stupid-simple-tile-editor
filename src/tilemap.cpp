@@ -2,6 +2,7 @@
 #include "../include/texture.hpp"
 #include "../include/f_utils.hpp"
 #include "../include/json.hpp"
+#include "../include/util.hpp"
 #include <cstddef>
 #include <cstring>
 #include <raylib.h>
@@ -137,4 +138,62 @@ void tilemap::toggle_layer(const std::string& name){
 
     if(*render == true) *render = false;
     else if(*render == false) *render = true;
+}
+
+void tilemap::export_tilemap(const std::string& fname){
+    size_t total_size = 0;
+
+    total_size = total_size + sizeof(tile_map_header);
+
+    for(int i = 0; i < layers.size(); i++){
+        size_t layer_size = 0;
+
+        layer_size = layer_size + sizeof(layer_header);
+
+        layer_size = layer_size + ((layers[i].size.x * layers[i].size.y) * sizeof(tile_index));
+        
+        total_size = total_size + layer_size;
+    }
+
+    char* buffer = new char[total_size];
+    size_t pointer = 0;
+
+    tile_map_header tm_header;
+
+    tm_header.layer_count = layers.size();
+
+    memcpy(buffer + pointer, &tm_header, sizeof(tile_map_header));
+    pointer = pointer + sizeof(tile_map_header);
+
+    for(int i = 0; i < layers.size(); i++){
+        layer_header lh = {0};
+
+        layer* l = &layers[i];
+
+        lh.size.x = l->size.x;
+        lh.size.y = l->size.y;
+        util::float_to_bytes(l->pos_scale, lh.pos_scale_p_float);
+        
+        size_t name_size = l->name.size() + 1;
+
+        if(name_size >= MAX_LAYER_NAME_LENGTH){
+            name_size = MAX_LAYER_NAME_LENGTH - 1;
+        }
+
+        memcpy(lh.name, l->name.c_str(), name_size);
+        lh.name[MAX_LAYER_NAME_LENGTH-1] = '\0';
+
+        memcpy(buffer + pointer, &lh, sizeof(layer_header));
+        
+        pointer = pointer + sizeof(layer_header);
+
+        size_t layer_data_size = (l->size.x * l->size.y) * sizeof(tile_index);
+
+        memcpy(buffer + pointer, l->data, layer_data_size);
+
+        pointer = pointer + layer_data_size;
+    }
+    std::string bin_str(reinterpret_cast<char*>(buffer), total_size);
+
+    easy_file_ops::save_binary_file(bin_str, fname);
 }
