@@ -196,4 +196,46 @@ void tilemap::export_tilemap(const std::string& fname){
     std::string bin_str(reinterpret_cast<char*>(buffer), total_size);
 
     easy_file_ops::save_binary_file(bin_str, fname);
+
+    delete [] buffer;
+}
+
+void tilemap::load_tilemap(const std::string& fname){
+    std::string bin_file = easy_file_ops::load_binary_file(fname);
+
+    layers.clear();
+
+    size_t pointer = 0;
+
+    const char* buffer = bin_file.data();
+    
+    tile_map_header tm_header;
+
+    memcpy(&tm_header, buffer + pointer, sizeof(tile_map_header));
+    pointer = pointer + sizeof(tile_map_header);
+
+    for(int i = 0; i < tm_header.layer_count; i++){
+        layer_header lh;
+
+        memcpy(&lh, buffer + pointer, sizeof(layer_header));
+
+        pointer = pointer + sizeof(layer_header);
+
+        layer l;
+
+        l.resize({lh.size.x, lh.size.y});
+        l.tile_size = {16, 16};
+        l.name = lh.name;
+        l.pos_scale = util::bytes_to_float(lh.pos_scale_p_float);
+        l.render = true;
+
+        size_t data_size = (lh.size.x * lh.size.y) * sizeof(tile_index);
+
+        memcpy(l.data, buffer + pointer, data_size);
+
+        pointer = pointer + data_size;
+
+        layers.push_back(l);
+    }
+    
 }
