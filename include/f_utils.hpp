@@ -15,10 +15,6 @@ class easy_file_ops{
 
         static int save_binary_file(const std::string& data, std::string fname);
 
-        static std::string compress_gzip(const std::string& data);
-
-        static std::string decompress_gzip(const std::string& data);
-
         static bool file_exists(const std::string& f_name);
 
 };

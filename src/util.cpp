@@ -1,8 +1,8 @@
 #include <cstdint>
 #include <string.h>
+#include "../include/util.hpp"
 
-
-void float_to_bytes(float f, uint8_t out[4]) {
+void util::float_to_bytes(float f, uint8_t out[4]) {
     uint32_t temp;
     memcpy(&temp, &f, sizeof(temp));  // safe bit copy
 
@@ -13,7 +13,7 @@ void float_to_bytes(float f, uint8_t out[4]) {
     out[3] = temp & 0xFF;
 }
 
-float bytes_to_float(const uint8_t in[4]) {
+float util::bytes_to_float(const uint8_t in[4]) {
     uint32_t temp =
         ((uint32_t)in[0] << 24) |
         ((uint32_t)in[1] << 16) |

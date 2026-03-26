@@ -15,17 +15,19 @@ void layer::resize(int_vector2 new_size){
     if(size.x > new_size.x) size.x = new_size.x;
     if(size.y > new_size.y) size.y = new_size.y;
 
+    std::cout << "new size: " << new_size.x << ", " << new_size.y << std::endl << "old size: " << size.x << ", " << size.y << std::endl;
+
     for(int x = 0; x < size.x; x++){
         for(int y = 0; y < size.y; y++){
             int index_new = (y * new_size.y) + x;
             int index_old = (y * size.y) + x;
 
-
             new_tiles[index_new] = data[index_old];
         }
     }
 
-    delete [] data;
+    if(data)
+        delete [] data;
 
     data = new_tiles;
 
@@ -39,7 +41,7 @@ layer::~layer(){
 }
 
 int tilemap::find_layer_index(const std::string& name){
-    for(int i = 0; i < layers.size(); i++){
+    for(size_t i = 0; i < layers.size(); i++){
         if(layers[i].name == name) return i;
     }
 
@@ -47,7 +49,7 @@ int tilemap::find_layer_index(const std::string& name){
 }
 
 void tilemap::draw_layer(int layer_i, Vector2 offset){
-    if(layer_i >= layers.size()) return;
+    if(layer_i >= (int)layers.size()) return;
 
 
     layer* l = &layers[layer_i];
@@ -145,7 +147,7 @@ void tilemap::export_tilemap(const std::string& fname){
 
     total_size = total_size + sizeof(tile_map_header);
 
-    for(int i = 0; i < layers.size(); i++){
+    for(size_t i = 0; i < layers.size(); i++){
         size_t layer_size = 0;
 
         layer_size = layer_size + sizeof(layer_header);
@@ -165,7 +167,7 @@ void tilemap::export_tilemap(const std::string& fname){
     memcpy(buffer + pointer, &tm_header, sizeof(tile_map_header));
     pointer = pointer + sizeof(tile_map_header);
 
-    for(int i = 0; i < layers.size(); i++){
+    for(size_t i = 0; i < layers.size(); i++){
         layer_header lh = {0};
 
         layer* l = &layers[i];
@@ -214,7 +216,7 @@ void tilemap::load_tilemap(const std::string& fname){
     memcpy(&tm_header, buffer + pointer, sizeof(tile_map_header));
     pointer = pointer + sizeof(tile_map_header);
 
-    for(int i = 0; i < tm_header.layer_count; i++){
+    for(size_t i = 0; i < tm_header.layer_count; i++){
         layer_header lh;
 
         memcpy(&lh, buffer + pointer, sizeof(layer_header));

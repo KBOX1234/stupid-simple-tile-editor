@@ -44,59 +44,6 @@ int easy_file_ops::save_to_text_file(std::string data, std::string filename){
     return 0;
 }
 
-std::string easy_file_ops::compress_gzip(const std::string &data){
-    z_stream zs{};
-    deflateInit2(&zs, Z_BEST_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY); // +16 → gzip
-
-    zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(data.data()));
-    zs.avail_in = data.size();
-
-    std::vector<char> outbuffer(32768);
-    std::string outstring;
-
-    int ret;
-    do {
-        zs.next_out = reinterpret_cast<Bytef*>(outbuffer.data());
-        zs.avail_out = outbuffer.size();
-        ret = deflate(&zs, Z_FINISH);
-        outstring.append(outbuffer.data(), outbuffer.size() - zs.avail_out);
-    } while (ret == Z_OK);
-
-    deflateEnd(&zs);
-    return outstring;
-}
-
-std::string easy_file_ops::decompress_gzip(const std::string &data) {
-    z_stream zs{};
-    zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(data.data()));
-    zs.avail_in = data.size();
-
-    if (inflateInit2(&zs, 15 + 16) != Z_OK) {
-        throw std::runtime_error("inflateInit2() failed while decompressing gzip data");
-    }
-
-    std::vector<char> outbuffer(32768);
-    std::string outstring;
-
-    int ret;
-    do {
-        zs.next_out = reinterpret_cast<Bytef*>(outbuffer.data());
-        zs.avail_out = outbuffer.size();
-
-        ret = inflate(&zs, 0);
-
-        if (ret != Z_OK && ret != Z_STREAM_END) {
-            inflateEnd(&zs);
-            throw std::runtime_error("inflate() failed while decompressing gzip data");
-        }
-
-        outstring.append(outbuffer.data(), outbuffer.size() - zs.avail_out);
-    } while (ret != Z_STREAM_END);
-
-    inflateEnd(&zs);
-    return outstring;
-}
-
 bool easy_file_ops::file_exists(const std::string& f_name) {
     return std::filesystem::exists(f_name);
 }

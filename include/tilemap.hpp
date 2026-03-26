@@ -39,7 +39,7 @@ struct tile_map_header{
 struct layer{
     int_vector2 size = {0};
    
-    tile_index* data;
+    tile_index* data = nullptr;
 
     float pos_scale = 1;
 

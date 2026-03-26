@@ -59,9 +59,9 @@ Texture2D texture_manager::yoink_texture(int id){
     if(txt->texture.id == 0) {
         if(id == default_texture_id || default_texture_id == -1){
 
-            std::cout << "(TEXTURE_MASTER): Returned error because while falling back to the default texture, it was found that the default texture was invalid.\n(TEXTURE_MASTER): Error Code: " << DEFAULT_TEXTURE_INVALID << std::endl;
+            std::cout << "(TEXTURE_MASTER): Returned error because while falling back to the default texture, it was found that the default texture was invalid.\n(TEXTURE_MASTER): Error Code: " << -1 << std::endl;
             
-            exit(DEFAULT_TEXTURE_INVALID);
+            exit(-1);
             
         }
 
@@ -77,7 +77,7 @@ void texture_manager::set_default_texture(const std::string& path){
     default_texture_T = yoink_texture(default_texture_id);
     
     if(default_texture_T.id == 0){
-        std::cout << "(TEXTURE_MASTER): Returned error because set_default_texture() failed to find texture\n(TEXTURE_MASTER): Error Code: " << DEFAULT_TEXTURE_INVALID << std::endl;
+        std::cout << "(TEXTURE_MASTER): Returned error because set_default_texture() failed to find texture\n(TEXTURE_MASTER): Error Code: " << -1 << std::endl;
     }
 }
 
